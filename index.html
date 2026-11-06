@@ -199,6 +199,37 @@ a:hover{text-decoration:underline}
 #toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:#1e1e22;border:1px solid var(--border-h);color:var(--fg);padding:11px 18px;border-radius:12px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:100;max-width:90vw;text-align:center}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
+.announce{background:#1a1430;border-bottom:1px solid #2f2752;color:#d6ccff;font-size:13.5px;text-align:center;padding:9px 16px;line-height:1.5}
+.modal{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:18px}
+.modal[hidden]{display:none}
+.modal-card{width:100%;max-width:600px;max-height:92dvh;overflow-y:auto;background:#141416;border:1px solid var(--border-h);border-radius:18px;box-shadow:0 24px 80px rgba(0,0,0,.6)}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border-2);position:sticky;top:0;background:#141416;z-index:2}
+.modal-head b{font-size:15px}
+.modal-body{padding:16px 18px 20px;display:flex;flex-direction:column;gap:12px}
+.modal-body label{display:flex;flex-direction:column;gap:5px;font-size:12.5px;color:var(--fg-3)}
+.modal-body input,.modal-body textarea,.modal-body select{background:#0f0f11;border:1px solid var(--border-2);border-radius:10px;padding:9px 11px;color:var(--fg);font-family:inherit;font-size:14px;outline:none;width:100%}
+.modal-body input:focus,.modal-body textarea:focus,.modal-body select:focus{border-color:var(--border-h)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid2 .wide{grid-column:1/-1}
+.models-row{display:flex;flex-wrap:wrap;gap:8px}
+.models-row label{flex-direction:row;align-items:center;gap:7px;background:#0f0f11;border:1px solid var(--border-2);border-radius:999px;padding:7px 12px;font-size:13px;color:var(--fg-2);cursor:pointer}
+.models-row input{width:auto;accent-color:var(--blue)}
+.btn{background:#1f1f23;border:1px solid var(--border-h);color:var(--fg);border-radius:10px;padding:10px 14px;font-size:14px;font-weight:500;transition:background .15s}
+.btn:hover{background:#26262b}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.primary:hover{background:#0a72dc}
+.btn.danger{color:#ff8f8f}
+.btn-row{display:flex;flex-wrap:wrap;gap:8px}
+.modal-status{font-size:13px;min-height:18px;line-height:1.4}
+.modal-status.ok{color:#30d158}.modal-status.err{color:#ff8f8f}
+.modal-err{font-size:13px;color:#ff8f8f;min-height:16px}
+.hint{font-size:12px;color:var(--fg-4);line-height:1.5;margin:0}
+.sep{border:none;border-top:1px solid var(--border-2);margin:2px 0}
+.ext-block{display:flex;flex-direction:column;gap:8px}
+.ext-block b{font-size:13.5px}
+.pub-row{display:flex}
+@media (max-width:560px){ .grid2{grid-template-columns:1fr} }
+
 /* ===== Mobile ===== */
 @media (max-width:760px){
   .rail{display:none}
@@ -232,6 +263,9 @@ a:hover{text-decoration:underline}
       <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20"><path d="M8.52 2.16a2.35 2.35 0 0 1 2.96 0l6.56 5.34a.8.8 0 0 1-1.01 1.24l-.63-.51v7.23a2 2 0 0 1-2 2H12v-4.1a2 2 0 0 0-4 0v4.1H5.6a2 2 0 0 1-2-2V8.23l-.63.51A.8.8 0 0 1 1.96 7.5l6.56-5.34Z"/></svg>
     </a>
     <div class="rail-spacer"></div>
+    <button class="rail-btn" id="railAdmin" title="Настройки" aria-label="Настройки">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
     <img class="rail-logo" src="favicon.svg" alt="io.ru"/>
   </nav>
 
@@ -267,11 +301,12 @@ a:hover{text-decoration:underline}
         <span class="word">MashaGPT</span>
       </div>
       <div class="topbar-right">
-        <span class="chip"><span class="dot"></span>Безлимит · без регистрации</span>
+        <span class="chip"><span class="dot"></span><span id="chipTxt">Безлимит · без регистрации</span></span>
       </div>
     </header>
 
     <div class="chat-shell">
+      <div class="announce" id="announce" hidden></div>
       <div class="chat-scroll" id="chatScroll">
         <div class="chat-inner">
           <!-- Empty state -->
@@ -383,6 +418,7 @@ a:hover{text-decoration:underline}
         <div class="foot">
           <span class="d">© io.ru — ChatGPT онлайн на русском без VPN и регистрации</span>
           <span>Интерфейс: клон MashaGPT · демо без аккаунта</span>
+          <a href="#admin" style="color:var(--fg-3)">⚙ Настройки</a>
         </div>
       </div>
     </section>
@@ -391,6 +427,53 @@ a:hover{text-decoration:underline}
 
 <input type="file" id="fileInput" hidden accept="*/*"/>
 <div id="toast"></div>
+
+<!-- Admin -->
+<div id="adminModal" class="modal" hidden>
+  <div class="modal-card">
+    <div class="modal-head"><b>Админка · io.ru</b><button id="adminClose" class="icon-btn" title="Закрыть"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+    <div id="adminLogin" class="modal-body">
+      <label>Логин<input id="admLogin" type="text" autocomplete="username" placeholder="admin"/></label>
+      <label>Пароль<input id="admPass" type="password" autocomplete="current-password"/></label>
+      <div class="modal-err" id="admErr"></div>
+      <button id="admLoginBtn" class="btn primary">Войти</button>
+      <p class="hint">Панель управления настройками сайта.</p>
+    </div>
+    <div id="adminPanel" class="modal-body" hidden>
+      <div class="grid2">
+        <label>Название (логотип)<input id="s_brand" type="text"/></label>
+        <label>Заголовок страницы<input id="s_title" type="text"/></label>
+        <label>Приветствие в чате<input id="s_greeting" type="text"/></label>
+        <label>Чип лимита<input id="s_limit" type="text"/></label>
+        <label>Баннер (пусто = скрыт)<input id="s_ann" type="text"/></label>
+        <label>Макс. файл, МБ (1–50)<input id="s_maxmb" type="number" min="1" max="50" step="1"/></label>
+        <label class="wide">Заголовок лендинга<input id="s_lead_t" type="text"/></label>
+        <label class="wide">Описание под заголовком<textarea id="s_lead_p" rows="2"></textarea></label>
+        <label class="wide">Доп. инструкция для ИИ (system prompt)<textarea id="s_sys" rows="3" placeholder="пусто = стандартное"></textarea></label>
+      </div>
+      <div class="models-row" id="s_models"></div>
+      <label class="wide">Модель по умолчанию<select id="s_defmodel"></select></label>
+      <hr class="sep"/>
+      <div class="ext-block">
+        <b>Свой API (OpenAI-совместимый)</b>
+        <label>URL (…/chat/completions)<input id="s_ext_url" type="text" placeholder="пусто = встроенный бесплатный API"/></label>
+        <label>API-ключ<input id="s_ext_key" type="password" placeholder="sk-..."/></label>
+        <label>Имя модели<input id="s_ext_model" type="text" placeholder="напр. deepseek-chat"/></label>
+        <p class="hint">Ключ хранится только в этом браузере и никогда не публикуется. Если запрос к своему API не удался — чат автоматически перейдёт на встроенный.</p>
+      </div>
+      <hr class="sep"/>
+      <label class="wide">GitHub-токен для публикации (права repo)<input id="s_tok" type="password" placeholder="ghp_..."/></label>
+      <div class="btn-row">
+        <button id="admSaveLocal" class="btn">Сохранить локально</button>
+        <button id="admPublish" class="btn primary">Опубликовать на сайте</button>
+        <button id="admReset" class="btn danger">Сброс локальных</button>
+        <button id="admLogout" class="btn">Выйти</button>
+      </div>
+      <div class="modal-status" id="admStatus"></div>
+      <p class="hint">«Сохранить локально» — действует только в этом браузере. «Опубликовать» — пишет settings.json на хабе (GitHub Pages): у всех посетителей обновится через ~1 минуту. Токен вводится один раз и остаётся в этом браузере.</p>
+    </div>
+  </div>
+</div>
 
 <script>
 "use strict";
@@ -463,6 +546,8 @@ function render(){
     for(const m of chat.messages) msgs.appendChild(msgEl(m));
     scrollBottom(true);
   }
+  const em2=MODELS.find(m=>m.id===SETTINGS.defaultModel&&SETTINGS.models[m.id]);
+  if(!SETTINGS.models[model.id]||em2) model=em2||MODELS.find(m=>SETTINGS.models[m.id])||MODELS[0];
   $("#modelName").textContent = model.name;
   renderModelMenu();
   updateSendState();
@@ -521,6 +606,7 @@ function updateSendState(){
 function renderModelMenu(){
   const menu = $("#modelMenu"); menu.innerHTML="";
   for(const m of MODELS){
+    if(!SETTINGS.models[m.id]) continue;
     const o=document.createElement("div");
     o.className="model-opt"+(m.id===model.id?" sel":"");
     o.innerHTML='<span class="n"></span><span class="f"></span>';
@@ -644,6 +730,151 @@ function renderFaq(){
   }
 }
 
+/* ================= Settings & Admin ================= */
+const LS_SETTINGS="ioGPT_settings_v1", LS_EXT="ioGPT_ext_v1", LS_TOK="ioGPT_tok_v1";
+const DEF={
+  brand:"MashaGPT",
+  pageTitle:"ChatGPT онлайн на русском без VPN | io.ru",
+  greeting:"Чем могу помочь?",
+  limitText:"Безлимит · без регистрации",
+  announcement:"",
+  leadTitle:"ChatGPT онлайн на русском языке",
+  leadText:"ChatGPT онлайн в MashaGPT — это русскоязычный ИИ-чат для текстов, кода, файлов и повседневных вопросов. Чат GPT работает в браузере без VPN и без регистрации: поставьте задачу, получите ответ и уточняйте результат в том же диалоге.",
+  sysExtra:"",
+  defaultModel:"chatgpt",
+  models:{chatgpt:true,claude:true,gemini:true,grok:true},
+  maxFileMB:10
+};
+let SETTINGS=JSON.parse(JSON.stringify(DEF));
+const GH_REPO="maximmotorolka/mashagpt-io";
+const ADMIN_HASH="901f24a5a77bfb440c3cf4ae25b7126504115b800d5b618d07736de8e1eeab60";
+async function sha256hex(s){
+  try{
+    const b=await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
+    return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,"0")).join("");
+  }catch(e){ return s; }
+}
+async function loadSettings(){
+  SETTINGS=JSON.parse(JSON.stringify(DEF));
+  try{
+    const ctl=new AbortController(); const to=setTimeout(()=>ctl.abort(),3500);
+    const r=await fetch("settings.json",{signal:ctl.signal,cache:"no-store"}); clearTimeout(to);
+    if(r.ok){ const j=await r.json(); for(const k in DEF){ if(j[k]!==undefined) SETTINGS[k]=j[k]; } SETTINGS._pub=true; }
+  }catch(e){}
+  try{
+    const loc=JSON.parse(localStorage.getItem(LS_SETTINGS)||"{}");
+    for(const k in DEF){ if(loc[k]!==undefined) SETTINGS[k]=loc[k]; }
+    SETTINGS._local=Object.keys(loc).length>0;
+  }catch(e){}
+  if(!MODELS.find(m=>m.id===SETTINGS.defaultModel)) SETTINGS.defaultModel="chatgpt";
+  SETTINGS.maxFileMB=Math.max(1,Math.min(50,parseInt(SETTINGS.maxFileMB)||10));
+}
+function applySettings(){
+  document.title=SETTINGS.pageTitle||DEF.pageTitle;
+  const w=document.querySelector(".brand .word"); if(w) w.textContent=SETTINGS.brand||DEF.brand;
+  const g=document.querySelector("#emptyState h1"); if(g) g.textContent=SETTINGS.greeting||DEF.greeting;
+  const c=document.getElementById("chipTxt"); if(c) c.textContent=SETTINGS.limitText||DEF.limitText;
+  const a=document.getElementById("announce"); if(a){ a.textContent=SETTINGS.announcement||""; a.hidden=!a.textContent; }
+  const lt=document.querySelector(".landing h2"); if(lt) lt.textContent=SETTINGS.leadTitle||DEF.leadTitle;
+  const lp=document.querySelector(".landing .lead"); if(lp) lp.textContent=SETTINGS.leadText||DEF.leadText;
+  const em=MODELS.find(m=>m.id===SETTINGS.defaultModel&&SETTINGS.models[m.id]);
+  if(!SETTINGS.models[model.id]||em) model=em||MODELS.find(m=>SETTINGS.models[m.id])||MODELS[0];
+  renderModelMenu();
+}
+function getExt(){ try{ return JSON.parse(localStorage.getItem(LS_EXT)||"{}"); }catch(e){ return {}; } }
+
+/* ---- admin modal ---- */
+const PUB_FIELDS=["brand","pageTitle","greeting","limitText","announcement","leadTitle","leadText","sysExtra","defaultModel","models","maxFileMB"];
+function collectPub(){
+  const o={};
+  o.brand=$("#s_brand").value.trim()||DEF.brand;
+  o.pageTitle=$("#s_title").value.trim()||DEF.pageTitle;
+  o.greeting=$("#s_greeting").value.trim()||DEF.greeting;
+  o.limitText=$("#s_limit").value.trim()||DEF.limitText;
+  o.announcement=$("#s_ann").value.trim();
+  o.leadTitle=$("#s_lead_t").value.trim()||DEF.leadTitle;
+  o.leadText=$("#s_lead_p").value.trim()||DEF.leadText;
+  o.sysExtra=$("#s_sys").value.trim();
+  o.defaultModel=$("#s_defmodel").value||"chatgpt";
+  o.models={}; MODELS.forEach(m=>o.models[m.id]=$("#s_models input[data-m="+m.id+"]").checked);
+  const mb=parseInt($("#s_maxmb").value); o.maxFileMB=(mb>=1&&mb<=50)?mb:10;
+  return o;
+}
+function fillPanel(){
+  $("#s_brand").value=SETTINGS.brand; $("#s_title").value=SETTINGS.pageTitle;
+  $("#s_greeting").value=SETTINGS.greeting; $("#s_limit").value=SETTINGS.limitText;
+  $("#s_ann").value=SETTINGS.announcement; $("#s_maxmb").value=SETTINGS.maxFileMB;
+  $("#s_lead_t").value=SETTINGS.leadTitle; $("#s_lead_p").value=SETTINGS.leadText;
+  $("#s_sys").value=SETTINGS.sysExtra;
+  const box=$("#s_models"); box.innerHTML="";
+  MODELS.forEach(m=>{
+    const l=document.createElement("label");
+    const i=document.createElement("input"); i.type="checkbox"; i.dataset.m=m.id; i.checked=!!SETTINGS.models[m.id];
+    l.appendChild(i); l.appendChild(document.createTextNode(m.name));
+    box.appendChild(l);
+  });
+  const sel=$("#s_defmodel"); sel.innerHTML="";
+  MODELS.filter(m=>SETTINGS.models[m.id]).forEach(m=>{
+    const o=document.createElement("option"); o.value=m.id; o.textContent=m.name; if(m.id===SETTINGS.defaultModel) o.selected=true;
+    sel.appendChild(o);
+  });
+  const ext=getExt();
+  $("#s_ext_url").value=ext.url||""; $("#s_ext_key").value=ext.key||""; $("#s_ext_model").value=ext.model||"";
+  $("#s_tok").value=localStorage.getItem(LS_TOK)||"";
+}
+function adminStatus(msg,ok){
+  const s=$("#admStatus"); s.textContent=msg; s.className="modal-status "+(ok?"ok":"err");
+}
+function openAdmin(){
+  $("#adminModal").hidden=false;
+  if(sessionStorage.getItem("ioGPT_admin")==="1"){
+    $("#adminLogin").hidden=true; $("#adminPanel").hidden=false; fillPanel();
+  } else {
+    $("#adminLogin").hidden=false; $("#adminPanel").hidden=true;
+    setTimeout(()=>$("#admLogin").focus(),50);
+  }
+}
+function closeAdmin(){ $("#adminModal").hidden=true; }
+async function adminLogin(){
+  const login=$("#admLogin").value.trim(), pass=$("#admPass").value;
+  const h=await sha256hex(pass);
+  if(login==="admin"&&h===ADMIN_HASH){
+    sessionStorage.setItem("ioGPT_admin","1");
+    $("#admLogin").hidden=true; $("#adminPanel").hidden=false; $("#admErr").textContent="";
+    fillPanel();
+  } else {
+    $("#admErr").textContent="Неверный логин или пароль";
+  }
+}
+async function ghApi(path, method, body, tok){
+  const headers={"Accept":"application/vnd.github+json","User-Agent":"io-gpt-admin"};
+  if(tok) headers.Authorization="token "+tok;
+  const opt={method,headers};
+  if(body) { headers["Content-Type"]="application/json"; opt.body=JSON.stringify(body); }
+  const r=await fetch("https://api.github.com"+path,opt);
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(j.message||("HTTP "+r.status));
+  return j;
+}
+async function adminPublish(){
+  const tok=$("#s_tok").value.trim();
+  if(!tok){ adminStatus("Введите GitHub-токен (права repo)",false); return; }
+  if(!confirm("Опубликовать эти настройки на сайт? Все посетители увидят изменения через ~1 минуту.")) return;
+  try{
+    const pub=collectPub();
+    const content=btoa(unescape(encodeURIComponent(JSON.stringify(pub,null,2))));
+    let sha=null;
+    try{ const c=await ghApi("/repos/"+GH_REPO+"/contents/settings.json","GET",null,tok); sha=c.sha; }catch(e){}
+    await ghApi("/repos/"+GH_REPO+"/contents/settings.json","PUT",{message:"settings: admin publish",content,branch:"main",...(sha?{sha}:{})},tok);
+    localStorage.setItem(LS_TOK,tok);
+    localStorage.setItem(LS_SETTINGS,JSON.stringify(pub));
+    await loadSettings(); applySettings(); render();
+    adminStatus("Опубликовано: settings.json обновлён, Pages пересоберётся в течение минуты.",true);
+  }catch(e){
+    adminStatus("Ошибка публикации: "+e.message+" (нужен токен с правом Contents: read/write для этого репозитория)",false);
+  }
+}
+
 /* ================= AI API (pollinations, keyless) ================= */
 const FILE_BIG=60000, FILE_BUDGET=120000;
 function fileSlice(text, lines, budget){
@@ -672,6 +903,7 @@ function apiMessages(){
   const nFiles=Math.max(1,fileMsgs.reduce((a,m)=>a+m.files.length,0));
   const perFile=Math.min(FILE_BIG, Math.floor(FILE_BUDGET/nFiles));
   let sys="Ты — полезный ИИ-ассистент. Отвечай на языке пользователя (по умолчанию — на русском). Форматируй ответы в Markdown: заголовки, списки, блоки кода. Отвечай развёрнуто и по делу.";
+  if(SETTINGS.sysExtra) sys+="\n\n"+SETTINGS.sysExtra;
   if(fileMsgs.length){
     sys+="\n\nПользователь прикрепил файл(ы). Если просят исправить/отредактировать/дописать файл — верни результат одним кодовым блоком с языком, соответствующим расширению файла. Если файл большой (в нём есть маркер «пропущено») — верни только изменённые участки с 2–3 строками контекста вокруг и укажи, куда их вставить; целиком большой файл не дублируй. Если просят найти ошибку или объяснить код — отвечай текстом, цитируй только нужные строки.";
   }
@@ -681,11 +913,13 @@ function apiMessages(){
   }
   return out;
 }
-async function streamTo(api,onDelta,signal){
-  const r=await fetch("https://text.pollinations.ai/openai",{
-    method:"POST",signal,
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({model:api,messages:apiMessages(),stream:true,max_tokens:4096})
+async function streamTo(p,onDelta,signal){
+  const headers={"Content-Type":"application/json"};
+  const url=p.ext?p.url:"https://text.pollinations.ai/openai";
+  if(p.ext&&p.key) headers.Authorization="Bearer "+p.key;
+  const r=await fetch(url,{
+    method:"POST",signal,headers,
+    body:JSON.stringify({model:p.api,messages:apiMessages(),stream:true,max_tokens:4096})
   });
   if(!r.ok||!r.body) throw new Error("http "+r.status);
   const reader=r.body.getReader(), dec=new TextDecoder();
@@ -725,15 +959,26 @@ async function send(){
   let full="", got=false;
   const onDelta=d=>{ if(!got){ got=true; ael.querySelector(".mtext").innerHTML=""; } full+=d; const tx=ael.querySelector(".mtext"); tx.innerHTML=md(full); fillCode(tx, replyFile); scrollBottom(); };
   let lastErr=null;
+function chainedSignal(base,ms){
+  if(AbortSignal.any) return AbortSignal.any([base,AbortSignal.timeout(ms)]);
+  const ac=new AbortController();
+  const to=setTimeout(()=>ac.abort(),ms);
+  base.addEventListener("abort",()=>{ clearTimeout(to); ac.abort(); },{once:true});
+  return ac.signal;
+}
   try{
-    for(const api of API_FALLBACK){
-      try{ await streamTo(api,onDelta,streaming.signal); break; }
+    const ext=getExt();
+    const chain=[];
+    if(ext.url&&ext.key) chain.push({ext:true,api:ext.model||model.name});
+    for(const a of API_FALLBACK) chain.push({api:a});
+    for(const p of chain){
+      try{ await streamTo(p,onDelta,chainedSignal(streaming.signal,45000)); break; }
       catch(e){ lastErr=e; if(streaming.signal.aborted) throw e; if(got) break; }
     }
     if(!got){
       try{
         const q=encodeURIComponent((text.trim()||"привет").slice(-1400));
-        const r=await fetch("https://text.pollinations.ai/"+q+"?model=openai",{signal:streaming.signal});
+        const r=await fetch("https://text.pollinations.ai/"+q+"?model=openai",{signal:chainedSignal(streaming.signal,60000)});
         if(!r.ok) throw new Error("http "+r.status);
         const t=(await r.text()).slice(0,20000);
         if(t&&t.length<400&&!/[\n.!?…]/.test(t)) throw new Error("short");
@@ -770,14 +1015,14 @@ $("#sendBtn").addEventListener("click",send);
 $("#newChatBtn").addEventListener("click",()=>{ createChat(); closeMobileSidebar(); });
 $$(".scard").forEach(b=>b.addEventListener("click",()=>{ input.value=b.dataset.prompt||""; autoSize(); input.focus(); }));
 $("#attachBtn").addEventListener("click",()=>$("#fileInput").click());
-const MAX_FILE=10*1024*1024;
 const fileStore=new Map();
+function maxFileBytes(){ return (SETTINGS.maxFileMB||10)*1024*1024; }
 function fmtSize(n){ if(n<1024) return n+" Б"; if(n<1048576) return (n/1024).toFixed(n<10485?1:0)+" КБ"; return (n/1048576).toFixed(1)+" МБ"; }
 function updatePlaceholder(){ $("#input").placeholder = attachments.length ? "Что сделать с «"+attachments.map(a=>a.name).join("», «")+"»?" : "Что мне нужно сделать?"; }
 $("#fileInput").addEventListener("change",e=>{
   for(const f of e.target.files){
     if(attachments.length>=3){ toast("Можно прикрепить до 3 файлов"); break; }
-    if(f.size>MAX_FILE){ toast("Файл больше 10 МБ: "+f.name); continue; }
+    if(f.size>maxFileBytes()){ toast("Файл больше "+(SETTINGS.maxFileMB||10)+" МБ: "+f.name); continue; }
     const rd=new FileReader();
     rd.onload=()=>{
       const t=String(rd.result||"");
@@ -809,9 +1054,42 @@ $("#burger").addEventListener("click",()=>{ $("#sidebar").classList.add("open-m"
 function closeMobileSidebar(){ $("#sidebar").classList.remove("open-m"); $("#backdrop").classList.remove("show"); }
 $("#backdrop").addEventListener("click",closeMobileSidebar);
 
+/* ================= Admin wiring ================= */
+$("#railAdmin").addEventListener("click",openAdmin);
+$("#adminClose").addEventListener("click",closeAdmin);
+$("#adminModal").addEventListener("click",e=>{ if(e.target.id==="adminModal") closeAdmin(); });
+$("#admLoginBtn").addEventListener("click",adminLogin);
+$("#admPass").addEventListener("keydown",e=>{ if(e.key==="Enter") adminLogin(); });
+$("#admSaveLocal").addEventListener("click",async()=>{
+  const pub=collectPub();
+  localStorage.setItem(LS_SETTINGS,JSON.stringify(pub));
+  const ext={url:$("#s_ext_url").value.trim(),key:$("#s_ext_key").value.trim(),model:$("#s_ext_model").value.trim()};
+  localStorage.setItem(LS_EXT,JSON.stringify(ext));
+  localStorage.setItem(LS_TOK,$("#s_tok").value.trim());
+  await loadSettings(); applySettings(); render();
+  adminStatus("Сохранено локально (только этот браузер).",true);
+});
+$("#admPublish").addEventListener("click",adminPublish);
+$("#admReset").addEventListener("click",async()=>{
+  localStorage.removeItem(LS_SETTINGS); localStorage.removeItem(LS_EXT);
+  await loadSettings(); applySettings(); render(); fillPanel();
+  adminStatus("Локальные настройки сброшены (публичные из settings.json сохранены).",true);
+});
+$("#admLogout").addEventListener("click",()=>{
+  sessionStorage.removeItem("ioGPT_admin");
+  $("#adminPanel").hidden=true; $("#adminLogin").hidden=false;
+  $("#admPass").value="";
+});
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeAdmin(); });
+
 /* ================= Init ================= */
-renderFaq();
-render();
+(async function(){
+  await loadSettings();
+  model=MODELS.find(m=>m.id===SETTINGS.defaultModel&&SETTINGS.models[m.id])||model;
+  applySettings(); renderFaq(); render();
+  if(location.hash==="#admin") openAdmin();
+  window.addEventListener("hashchange",()=>{ if(location.hash==="#admin") openAdmin(); });
+})();
 </script>
 </body>
 </html></

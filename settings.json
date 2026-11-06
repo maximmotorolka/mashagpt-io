@@ -1,0 +1,18 @@
+{
+  "brand": "MashaGPT",
+  "pageTitle": "ChatGPT онлайн на русском без VPN | io.ru",
+  "greeting": "Чем могу помочь?",
+  "limitText": "Безлимит · без регистрации",
+  "announcement": "",
+  "leadTitle": "ChatGPT онлайн на русском языке",
+  "leadText": "ChatGPT онлайн в MashaGPT — это русскоязычный ИИ-чат для текстов, кода, файлов и повседневных вопросов. Чат GPT работает в браузере без VPN и без регистрации: поставьте задачу, получите ответ и уточняйте результат в том же диалоге.",
+  "sysExtra": "",
+  "defaultModel": "chatgpt",
+  "models": {
+    "chatgpt": true,
+    "claude": true,
+    "gemini": true,
+    "grok": true
+  },
+  "maxFileMB": 10
+}

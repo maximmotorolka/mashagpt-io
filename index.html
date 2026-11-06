@@ -124,6 +124,7 @@ a:hover{text-decoration:underline}
 .mtext pre.codeblock code{display:block;padding:14px 16px;overflow-x:auto;background:none;border:none;font-size:13.5px;line-height:1.55;white-space:pre}
 .codehead{display:flex;justify-content:space-between;align-items:center;padding:7px 12px;background:#141416;border-bottom:1px solid var(--border-2);font-size:12px;color:var(--fg-3);font-family:ui-monospace,Menlo,Consolas,monospace}
 .codecopy{font-size:12px;color:var(--fg-3);padding:3px 8px;border-radius:6px}
+.cbtns{display:inline-flex;gap:6px}
 .codecopy:hover{background:#242428;color:var(--fg)}
 .mtext blockquote{border-left:3px solid var(--border-h);margin:8px 0;padding:2px 0 2px 14px;color:var(--fg-2)}
 .mtext table{border-collapse:collapse;margin:10px 0;width:100%;font-size:14.5px;display:block;overflow-x:auto}
@@ -388,7 +389,7 @@ a:hover{text-decoration:underline}
   </main>
 </div>
 
-<input type="file" id="fileInput" hidden accept=".txt,.md,.markdown,.csv,.json,.js,.ts,.py,.java,.c,.cpp,.h,.cs,.go,.rs,.php,.rb,.sql,.html,.css,.xml,.yml,.yaml,.ini,.log,text/*"/>
+<input type="file" id="fileInput" hidden accept="*/*"/>
 <div id="toast"></div>
 
 <script>
@@ -435,7 +436,7 @@ function renderChats(){
 }
 function openChat(id){ activeId = id; localStorage.setItem(LS_ACTIVE, id||""); render(); }
 function createChat(){
-  activeId = null; attachments = []; renderAttachChips();
+  activeId = null; attachments = []; renderAttachChips(); updatePlaceholder();
   localStorage.removeItem(LS_ACTIVE); render();
   $("#input").focus();
 }
@@ -482,6 +483,7 @@ function msgEl(m){
   } else {
     tx.innerHTML = m.error ? '<div class="err-note"></div>' : md(m.content||"");
     if(m.error) tx.querySelector(".err-note").textContent = m.error;
+    else fillCode(tx, m.replyFile);
   }
   b.appendChild(who); b.appendChild(tx); d.appendChild(av); d.appendChild(b);
   return d;
@@ -550,7 +552,7 @@ function md(src){
     let m;
     if(m=line.match(/^\u0000B(\d+)\u0000\s*$/)){
       closeList(); closePara();
-      html+='<pre class="codeblock"><div class="codehead"><span class="cl"></span><button class="codecopy" type="button">Копировать</button></div><code class="cb" data-bi="'+m[1]+'"></code></pre>';
+      html+='<pre class="codeblock"><div class="codehead"><span class="cl"></span><span class="cbtns"><button class="codecopy cdl" type="button">Скачать</button><button class="codecopy" type="button">Копировать</button></span></div><code class="cb" data-bi="'+m[1]+'"></code></pre>';
       continue;
     }
     if(/^\s*$/.test(line)){ closeList(); closePara(); continue; }
@@ -570,15 +572,37 @@ function md(src){
   md.lastBlocks=blocks; md.lastLangs=langs;
   return html;
 }
-function fillCode(tx){
+function dlName(code,lang,replyFile){
+  const exts={js:"js",javascript:"js",ts:"ts",typescript:"ts",jsx:"jsx",tsx:"tsx",py:"py",python:"py",html:"html",css:"css",json:"json",xml:"xml",md:"md",markdown:"md",sh:"sh",bash:"sh",ps1:"ps1",sql:"sql",c:"c",cpp:"cpp",h:"h",java:"java",go:"go",rs:"rs",php:"php",rb:"rb",yml:"yaml",yaml:"yaml",toml:"toml",ini:"ini",svg:"svg",vue:"vue",lua:"lua",r:"r"};
+  if(replyFile){
+    const meta=[...fileStore.values()].find(s=>s.name===replyFile);
+    if(meta && code.length>=Math.floor(meta.text.length*0.5)) return replyFile;
+  }
+  return "snippet."+(exts[lang]||"txt");
+}
+function fillCode(tx, replyFile){
   tx.querySelectorAll("code.cb").forEach(c=>{
     const bi=+c.dataset.bi;
-    c.textContent = (md.lastBlocks&&md.lastBlocks[bi]!=null) ? md.lastBlocks[bi] : "";
-    const pre=c.closest("pre"), sp=pre&&pre.querySelector(".cl");
-    if(sp) sp.textContent = (md.lastLangs&&md.lastLangs[bi]) || "code";
+    const code=(md.lastBlocks&&md.lastBlocks[bi]!=null)? md.lastBlocks[bi] : "";
+    c.textContent=code;
+    const pre=c.closest("pre"); if(!pre) return;
+    const sp=pre.querySelector(".cl");
+    if(sp) sp.textContent=(md.lastLangs&&md.lastLangs[bi])||"code";
+    const dl=pre.querySelector(".cdl");
+    if(dl) dl.dataset.name=dlName(code,(md.lastLangs&&md.lastLangs[bi])||"",replyFile);
   });
 }
 document.addEventListener("click",e=>{
+  const dl=e.target.closest(".cdl");
+  if(dl){
+    const pre=dl.closest("pre"), code=pre.querySelector("code");
+    const blob=new Blob([code.textContent||""],{type:"text/plain;charset=utf-8"});
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob); a.download=dl.dataset.name||"file.txt";
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },600);
+    return;
+  }
   const b=e.target.closest(".codecopy");
   if(!b) return;
   const code=b.closest("pre").querySelector("code");
@@ -591,6 +615,7 @@ document.addEventListener("click",e=>{
 const FAQ = [
 ["Нужно ли регистрироваться, чтобы пользоваться Чат GPT?","Нет. Просто откройте сайт и начните диалог: без email, кодов подтверждения и входа через VK, Яндекс ID или Mail.ru. Доступ бесплатный."],
 ["Какие ограничения имеет бесплатный Чат GPT?","Ограничений по числу сообщений нет: в этом режиме дневной лимит всегда «Безлимит». Доступные модели видны в селекторе рядом с чатом."],
+["Можно ли прикреплять большие файлы и редактировать их?","Да. Кнопкой «скрепка» можно прикрепить до 3 текстовых файлов (код, тексты, CSV, JSON) размером до 10 МБ. Нейросеть прочитает файл и сделает правки: результат придёт кодовым блоком с кнопками «Копировать» и «Скачать». Очень большие файлы обрабатываются по частям — попросите изменить конкретную часть файла."],
 ["Нужна ли подписка или оплата?","Нет. Все модели из селектора работают бесплатно — без тарифов, подписок и оплаты."],
 ["Какие модели нейросетей доступны пользователям?","В селекторе — актуальные семейства: OpenAI, Anthropic, Google и xAI. Конкретный состав зависит от текущего каталога и доступности."],
 ["Чем нейросеть Чат GPT лучше других чат-ботов?","ChatGPT удерживает контекст диалога, работает с файлами и помогает с текстами, кодом и анализом. Но лучшая модель зависит от задачи: Claude, Gemini или Grok в отдельных сценариях могут быть удобнее."],
@@ -620,14 +645,39 @@ function renderFaq(){
 }
 
 /* ================= AI API (pollinations, keyless) ================= */
+const FILE_BIG=60000, FILE_BUDGET=120000;
+function fileSlice(text, lines, budget){
+  if(text.length<=budget) return text;
+  const head=text.slice(0,Math.floor(budget*0.85));
+  const tail=text.slice(-Math.floor(budget*0.15));
+  const hLines=head.split("\n").length, tLines=tail.split("\n").length;
+  return head+"\n…(пропущено примерно "+Math.max(1,lines-hLines-tLines)+" строк)\n…\n"+tail;
+}
+function fileContextText(msg, perFile){
+  if(!msg.files||!msg.files.length) return "";
+  let out="";
+  for(const fm of msg.files){
+    const s=fileStore.get(fm.f);
+    if(!s){ out+="[Файл: "+fm.n+" — содержимое не доступно (страница была перезагружена; прикрепите файл снова)]\n"; continue; }
+    out+="[Файл: "+fm.n+" ("+fmtSize(s.text.length)+", "+s.lines+" стр.)]\n"+fileSlice(s.text,s.lines,perFile)+"\n";
+  }
+  return out;
+}
 function apiMessages(){
   const chat=activeChat();
-  const out=[{role:"system",content:"Ты — полезный ИИ-ассистент. Отвечай на языке пользователя (по умолчанию — на русском). Форматируй ответы в Markdown: заголовки, списки, блоки кода. Отвечай развёрнуто и по делу."}];
   const msgs=(chat&&chat.messages)||[];
   const start=msgs.length>12?msgs.length-12:0;
-  for(const m of msgs.slice(start)){
-    if(m.error||!m.content) continue;
-    out.push({role:m.role==="user"?"user":"assistant",content:(m.file?"[Файл: "+m.file+"]\n":"")+m.content});
+  const win=msgs.slice(start).filter(m=>!m.error&&m.content);
+  const fileMsgs=win.filter(m=>m.files&&m.files.length);
+  const nFiles=Math.max(1,fileMsgs.reduce((a,m)=>a+m.files.length,0));
+  const perFile=Math.min(FILE_BIG, Math.floor(FILE_BUDGET/nFiles));
+  let sys="Ты — полезный ИИ-ассистент. Отвечай на языке пользователя (по умолчанию — на русском). Форматируй ответы в Markdown: заголовки, списки, блоки кода. Отвечай развёрнуто и по делу.";
+  if(fileMsgs.length){
+    sys+="\n\nПользователь прикрепил файл(ы). Если просят исправить/отредактировать/дописать файл — верни результат одним кодовым блоком с языком, соответствующим расширению файла. Если файл большой (в нём есть маркер «пропущено») — верни только изменённые участки с 2–3 строками контекста вокруг и укажи, куда их вставить; целиком большой файл не дублируй. Если просят найти ошибку или объяснить код — отвечай текстом, цитируй только нужные строки.";
+  }
+  const out=[{role:"system",content:sys}];
+  for(const m of win){
+    out.push({role:m.role==="user"?"user":"assistant",content:fileContextText(m,perFile)+(m.content||"")});
   }
   return out;
 }
@@ -664,15 +714,16 @@ async function send(){
   if(streaming){ streaming.abort(); return; }
   const text=$("#input").value.trim();
   if(!text&&!attachments.length) return;
+  const replyFile=attachments.length?attachments[0].name:undefined;
   const fileLabel=attachments.length?attachments.map(a=>a.name).join(", "):undefined;
-  const fileContent=attachments.length?"\n\n"+attachments.map(a=>"[Файл: "+a.name+"]\n"+a.text.slice(0,20000)).join("\n\n"):"";
-  addMsg("user",text,{file:fileLabel});
-  $("#input").value=""; autoSize(); attachments=[]; renderAttachChips();
-  const {m:am,el:ael}=addMsg("ai","",{model:model.name});
+  const fileMeta=attachments.map(a=>({n:a.name,f:a.fid}));
+  addMsg("user",text,{file:fileLabel,files:fileMeta});
+  $("#input").value=""; autoSize(); attachments=[]; renderAttachChips(); updatePlaceholder();
+  const {m:am,el:ael}=addMsg("ai","",{model:model.name,replyFile:replyFile});
   ael.querySelector(".mtext").innerHTML='<span class="think"><i></i><i></i><i></i></span>';
   streaming=new AbortController(); updateSendState();
   let full="", got=false;
-  const onDelta=d=>{ if(!got){ got=true; ael.querySelector(".mtext").innerHTML=""; } full+=d; const tx=ael.querySelector(".mtext"); tx.innerHTML=md(full); fillCode(tx); scrollBottom(); };
+  const onDelta=d=>{ if(!got){ got=true; ael.querySelector(".mtext").innerHTML=""; } full+=d; const tx=ael.querySelector(".mtext"); tx.innerHTML=md(full); fillCode(tx, replyFile); scrollBottom(); };
   let lastErr=null;
   try{
     for(const api of API_FALLBACK){
@@ -681,7 +732,7 @@ async function send(){
     }
     if(!got){
       try{
-        const q=encodeURIComponent(((text+fileContent).trim()||"привет").slice(-1400));
+        const q=encodeURIComponent((text.trim()||"привет").slice(-1400));
         const r=await fetch("https://text.pollinations.ai/"+q+"?model=openai",{signal:streaming.signal});
         if(!r.ok) throw new Error("http "+r.status);
         const t=(await r.text()).slice(0,20000);
@@ -695,11 +746,11 @@ async function send(){
   const tx=ael.querySelector(".mtext");
   if(streaming.signal.aborted){
     am.pending=false;
-    if(full){ am.content=full; tx.innerHTML=md(full); fillCode(tx); }
+    if(full){ am.content=full; tx.innerHTML=md(full); fillCode(tx, replyFile); }
     else { am.content=""; am.error="Генерация остановлена."; tx.innerHTML='<div class="err-note">Генерация остановлена.</div>'; }
   } else if(full){
     am.pending=false; am.content=full; am.error=undefined;
-    tx.innerHTML=md(full); fillCode(tx);
+    tx.innerHTML=md(full); fillCode(tx, replyFile);
   } else {
     am.pending=false; am.content="";
     am.error="Не удалось получить ответ: сервис ИИ временно перегружен. Попробуйте ещё раз через минуту.";
@@ -719,12 +770,23 @@ $("#sendBtn").addEventListener("click",send);
 $("#newChatBtn").addEventListener("click",()=>{ createChat(); closeMobileSidebar(); });
 $$(".scard").forEach(b=>b.addEventListener("click",()=>{ input.value=b.dataset.prompt||""; autoSize(); input.focus(); }));
 $("#attachBtn").addEventListener("click",()=>$("#fileInput").click());
+const MAX_FILE=10*1024*1024;
+const fileStore=new Map();
+function fmtSize(n){ if(n<1024) return n+" Б"; if(n<1048576) return (n/1024).toFixed(n<10485?1:0)+" КБ"; return (n/1048576).toFixed(1)+" МБ"; }
+function updatePlaceholder(){ $("#input").placeholder = attachments.length ? "Что сделать с «"+attachments.map(a=>a.name).join("», «")+"»?" : "Что мне нужно сделать?"; }
 $("#fileInput").addEventListener("change",e=>{
   for(const f of e.target.files){
     if(attachments.length>=3){ toast("Можно прикрепить до 3 файлов"); break; }
-    if(f.size>100*1024){ toast("Файл больше 100 КБ: "+f.name); continue; }
+    if(f.size>MAX_FILE){ toast("Файл больше 10 МБ: "+f.name); continue; }
     const rd=new FileReader();
-    rd.onload=()=>{ attachments.push({name:f.name,text:String(rd.result||"")}); renderAttachChips(); updateSendState(); };
+    rd.onload=()=>{
+      const t=String(rd.result||"");
+      if(t.slice(0,8000).includes("\u0000")){ toast("Это не текстовый файл: "+f.name); return; }
+      const fid=newId();
+      fileStore.set(fid,{name:f.name,text:t,lines:t.split("\n").length});
+      attachments.push({name:f.name,fid:fid,size:f.size});
+      renderAttachChips(); updateSendState(); updatePlaceholder();
+    };
     rd.onerror=()=>toast("Не удалось прочитать файл");
     rd.readAsText(f);
   }
@@ -733,8 +795,10 @@ $("#fileInput").addEventListener("change",e=>{
 function renderAttachChips(){
   const box=$("#attChips"); box.innerHTML="";
   attachments.forEach((a,i)=>{
-    const c=document.createElement("span"); c.className="att-chip";
-    const sp=document.createElement("span"); sp.textContent=a.name;
+    const meta=fileStore.get(a.fid);
+    const c=document.createElement("span"); c.className="att-chip"; c.title="Файл доступен до перезагрузки страницы";
+    const sp=document.createElement("span");
+    sp.textContent=a.name+" · "+fmtSize(a.size)+(meta?" · "+meta.lines+" стр.":"");
     const b=document.createElement("button"); b.type="button"; b.textContent="✕"; b.title="Убрать файл";
     b.addEventListener("click",()=>{ attachments.splice(i,1); renderAttachChips(); updateSendState(); });
     c.appendChild(sp); c.appendChild(b); box.appendChild(c);

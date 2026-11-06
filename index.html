@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="theme-color" content="#000000"/>
+<title>ChatGPT онлайн на русском без VPN | io.ru</title>
+<meta name="description" content="Чат GPT онлайн на русском языке: ChatGPT 6.1 и Claude Opus 5.5 для текстов, кода и файлов. Работает в браузере без VPN и без регистрации."/>
+<meta name="robots" content="index, follow"/>
+<link rel="canonical" href="https://maximmotorolka.github.io/mashagpt-io/"/>
+<meta property="og:title" content="ChatGPT онлайн на русском без VPN | io.ru"/>
+<meta property="og:description" content="Русскоязычный ИИ-чат: тексты, код, файлы и повседневные вопросы. В браузере, без VPN и без регистрации."/>
+<meta property="og:url" content="https://maximmotorolka.github.io/mashagpt-io/"/>
+<meta property="og:type" content="website"/>
+<meta property="og:locale" content="ru_RU"/>
+<meta property="og:site_name" content="io.ru"/>
+<meta property="og:image" content="og.webp"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<link rel="shortcut icon" href="favicon.ico"/>
+<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png"/>
+<style>
+:root{
+  --bg:#000000; --bg-soft:#0a0a0a; --panel:#121212; --card:#141414; --card-h:#1a1a1a;
+  --border:#232323; --border-2:#272727; --border-3:#2a2a2a; --border-h:#363636;
+  --fg:#ffffff; --fg-2:#b3b3b3; --fg-3:#808080; --fg-4:#666666;
+  --blue:#0a84ff; --purple:#a78bfa;
+  --radius-input:26px; --radius-card:20px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--fg);
+  font-family:"SF Pro Display",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-size:16px; -webkit-font-smoothing:antialiased; overscroll-behavior:none;
+}
+button{font-family:inherit; cursor:pointer; background:none; border:none; color:inherit}
+a{color:var(--blue); text-decoration:none}
+a:hover{text-decoration:underline}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:4px}
+::-webkit-scrollbar-track{background:transparent}
+
+/* ===== Layout ===== */
+.layout{display:flex;height:100dvh;overflow:hidden}
+.main{flex:1;min-width:0;display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;position:relative;background:var(--bg)}
+
+/* ===== Rail ===== */
+.rail{width:64px;flex:0 0 64px;border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:10px 0;gap:6px;background:var(--bg)}
+.rail-btn{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--fg-2);transition:background .15s,color .15s}
+.rail-btn:hover{background:#1c1c1c;color:var(--fg)}
+.rail-btn.active{color:var(--fg)}
+.rail-spacer{flex:1}
+.rail-logo{width:34px;height:34px;border-radius:10px;padding:5px}
+
+/* ===== Sidebar ===== */
+.sidebar{width:260px;flex:0 0 260px;background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:12px 10px;gap:10px;transition:margin .25s ease}
+.sidebar.closed{margin-left:-261px}
+.new-chat{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;color:var(--fg);font-size:14.5px;font-weight:500;border:1px solid var(--border-2);background:#161616;transition:background .15s}
+.new-chat:hover{background:#1e1e1e}
+.new-chat svg{color:var(--blue);flex:0 0 auto}
+.side-label{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-4);padding:4px 12px 2px}
+.chat-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:2px;margin:-2px -4px}
+.chat-item{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:10px;font-size:14px;color:var(--fg-2);cursor:pointer;transition:background .12s;position:relative}
+.chat-item:hover{background:#1b1b1b;color:var(--fg)}
+.chat-item.active{background:#1f1f1f;color:var(--fg)}
+.chat-item .t{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-item .del{opacity:0;width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--fg-3);flex:0 0 auto}
+.chat-item:hover .del{opacity:1}
+.chat-item .del:hover{background:#2c2c2c;color:#ff6b6b}
+.no-chats{padding:14px 12px;font-size:13px;color:var(--fg-4);line-height:1.5}
+.side-foot{border-top:1px solid var(--border);padding:10px 8px 2px;display:flex;flex-direction:column;gap:8px}
+.side-card{background:var(--card);border:1px solid var(--border-2);border-radius:14px;padding:12px}
+.side-card b{display:block;font-size:13px;margin-bottom:4px}
+.side-card span{font-size:12px;color:var(--fg-3);line-height:1.45;display:block}
+.backdrop{display:none}
+
+/* ===== Topbar ===== */
+.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;padding:10px 20px;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);border-bottom:1px solid transparent;min-height:58px}
+.icon-btn{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--fg-2);flex:0 0 auto}
+.icon-btn:hover{background:#1c1c1c;color:var(--fg)}
+.brand{display:flex;align-items:center;gap:9px;min-width:0}
+.brand img{width:26px;height:26px;display:block}
+.brand .word{font-size:15.5px;font-weight:600;letter-spacing:-.01em;white-space:nowrap}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--fg-2);background:var(--card);border:1px solid var(--border-2);border-radius:999px;padding:6px 12px}
+.chip .dot{width:7px;height:7px;border-radius:50%;background:#30d158}
+.burger{display:none}
+
+/* ===== Chat shell ===== */
+.chat-shell{min-height:calc(100dvh - 58px);display:flex;flex-direction:column}
+.chat-scroll{flex:1;display:flex;flex-direction:column;padding:10px 20px 0}
+.chat-inner{width:100%;max-width:768px;margin:0 auto;display:flex;flex-direction:column;flex:1}
+
+/* Empty state */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:34px;padding:9vh 16px 6vh;flex:1}
+.empty h1{font-size:30px;font-weight:600;margin:0;letter-spacing:-.02em;text-align:center}
+.boot{display:flex;align-items:center;gap:9px;color:var(--fg-3);font-size:14px}
+.boot svg{animation:spark 1.6s ease-in-out infinite}
+@keyframes spark{0%,100%{opacity:.55;transform:scale(1)}50%{opacity:1;transform:scale(1.12)}}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;width:100%}
+.scard{display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-height:118px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);padding:16px;text-align:left;transition:background .15s,border-color .15s}
+.scard:hover{background:var(--card-h);border-color:var(--border-h)}
+.scard svg{width:28px;height:28px;color:var(--fg)}
+.scard .t{margin-top:10px;font-size:17px;font-weight:500}
+.scard .d{font-size:13px;line-height:1.4;color:var(--fg-3)}
+
+/* Messages */
+.msgs{display:flex;flex-direction:column;gap:22px;padding:18px 0 8px;width:100%}
+.msg{display:flex;gap:14px;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.msg.user .avatar{background:var(--blue)}
+.avatar{width:30px;height:30px;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;margin-top:2px}
+.avatar.masha{background:#1c1c1e;border:1px solid var(--border-2);padding:4px}
+.mbody{flex:1;min-width:0}
+.mwho{font-size:12.5px;color:var(--fg-3);margin-bottom:4px;font-weight:600}
+.mtext{font-size:16px;line-height:1.62;color:var(--fg);word-wrap:break-word;overflow-wrap:anywhere}
+.mtext p{margin:0 0 10px}.mtext p:last-child{margin-bottom:0}
+.mtext h3,.mtext h4,.mtext h5{margin:16px 0 8px;line-height:1.3}
+.mtext ul,.mtext ol{margin:6px 0 10px;padding-left:22px}
+.mtext li{margin:4px 0}
+.mtext code{background:#1c1c1e;border:1px solid var(--border-2);border-radius:5px;padding:1.5px 5px;font-size:13.5px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.mtext pre.codeblock{background:#0d0d0f;border:1px solid var(--border-2);border-radius:12px;margin:10px 0;overflow:hidden}
+.mtext pre.codeblock code{display:block;padding:14px 16px;overflow-x:auto;background:none;border:none;font-size:13.5px;line-height:1.55;white-space:pre}
+.codehead{display:flex;justify-content:space-between;align-items:center;padding:7px 12px;background:#141416;border-bottom:1px solid var(--border-2);font-size:12px;color:var(--fg-3);font-family:ui-monospace,Menlo,Consolas,monospace}
+.codecopy{font-size:12px;color:var(--fg-3);padding:3px 8px;border-radius:6px}
+.codecopy:hover{background:#242428;color:var(--fg)}
+.mtext blockquote{border-left:3px solid var(--border-h);margin:8px 0;padding:2px 0 2px 14px;color:var(--fg-2)}
+.mtext table{border-collapse:collapse;margin:10px 0;width:100%;font-size:14.5px;display:block;overflow-x:auto}
+.mtext th,.mtext td{border:1px solid var(--border-2);padding:7px 10px;text-align:left}
+.mtext hr{border:none;border-top:1px solid var(--border-2);margin:14px 0}
+.filechip{display:inline-flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--border-2);border-radius:10px;padding:7px 12px;font-size:13px;color:var(--fg-2);margin-bottom:8px}
+.err-note{color:#ff8f8f;font-size:14px;background:#1c1214;border:1px solid #3a2026;border-radius:12px;padding:12px 14px;line-height:1.5}
+.think{display:inline-flex;gap:4px;align-items:center;height:22px}
+.think i{width:7px;height:7px;border-radius:50%;background:var(--fg-4);animation:blink 1.2s infinite}
+.think i:nth-child(2){animation-delay:.2s}.think i:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+
+/* ===== Input ===== */
+.input-wrap{width:100%;max-width:768px;margin:8px auto 10px;padding:0 16px}
+.input-box{display:flex;align-items:flex-end;gap:8px;background:var(--card);border:1px solid var(--border-2);border-radius:var(--radius-input);padding:12px 12px 10px 18px;transition:border-color .15s,box-shadow .15s;position:relative}
+.input-box:focus-within{border-color:var(--border-h);box-shadow:0 0 0 3px rgba(10,132,255,.06)}
+.input-box textarea{flex:1;min-width:0;resize:none;border:none;outline:none;background:transparent;color:var(--fg);font-family:inherit;font-size:16px;line-height:1.6;max-height:180px;padding:4px 0}
+.input-box textarea::placeholder{color:var(--fg-4)}
+.mini-btn{width:32px;height:32px;flex:0 0 auto;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--fg-3);transition:background .15s,color .15s}
+.mini-btn:hover{background:#222;color:var(--fg)}
+.model-btn{display:flex;align-items:center;gap:5px;height:32px;padding:0 10px;border-radius:999px;color:var(--fg-2);font-size:13px;transition:background .15s;max-width:170px}
+.model-btn:hover{background:#222;color:var(--fg)}
+.model-btn .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500}
+.model-menu{position:absolute;bottom:calc(100% + 8px);right:52px;background:#161618;border:1px solid var(--border-h);border-radius:14px;padding:6px;min-width:230px;box-shadow:0 12px 40px rgba(0,0,0,.55);display:none;z-index:40}
+.model-menu.open{display:block}
+.model-opt{display:flex;flex-direction:column;gap:2px;padding:9px 12px;border-radius:10px;cursor:pointer}
+.model-opt:hover{background:#222}
+.model-opt.sel{background:#1f1f22}
+.model-opt .n{font-size:14px;font-weight:500;color:var(--fg)}
+.model-opt .f{font-size:12px;color:var(--fg-3)}
+.send-btn{width:32px;height:32px;flex:0 0 auto;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--blue);color:#fff;transition:opacity .15s,transform .15s}
+.send-btn:disabled{background:#26262a;color:var(--fg-4);cursor:not-allowed}
+.send-btn.stop{background:#3a3a40}
+.disclaimer{text-align:center;font-size:11.5px;color:var(--fg-4);padding:2px 0 14px}
+.att-chips{display:flex;flex-wrap:wrap;gap:8px;padding:0 4px}
+.att-chips:empty{display:none}
+.att-chip{display:inline-flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border-2);border-radius:10px;padding:6px 10px;font-size:12.5px;color:var(--fg-2)}
+.att-chip button{color:var(--fg-3);width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.att-chip button:hover{background:#2a2a2e;color:#ff6b6b}
+
+/* ===== Landing ===== */
+.landing{border-top:1px solid var(--border);background:var(--bg-soft);padding:56px 20px 40px;margin-top:20px}
+.landing-inner{max-width:960px;margin:0 auto}
+.landing h2{font-size:26px;font-weight:600;letter-spacing:-.02em;margin:0 0 12px}
+.landing .lead{color:var(--fg-3);font-size:15px;line-height:1.65;max-width:760px;margin:0 0 44px}
+.landing h3.sec{font-size:19px;font-weight:600;margin:44px 0 18px}
+.feat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.feat{position:relative;overflow:hidden;border-radius:16px;background:var(--card);border:1px solid var(--border-3);padding:24px;transition:border-color .25s}
+.feat:hover{border-color:#3a3a3a}
+.feat .ic{width:48px;height:48px;border-radius:12px;background:#252525;display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+.feat h4{margin:0 0 8px;font-size:17px;font-weight:600;color:#fff}
+.feat p{margin:0;color:var(--fg-3);font-size:14px;line-height:1.55}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;counter-reset:step}
+.step{background:var(--card);border:1px solid var(--border-3);border-radius:16px;padding:24px;position:relative}
+.step .num{width:34px;height:34px;border-radius:50%;background:#252525;color:var(--blue);font-weight:600;font-size:15px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.step h4{margin:0 0 8px;font-size:16px;font-weight:600}
+.step p{margin:0;color:var(--fg-3);font-size:14px;line-height:1.55}
+.faq{display:flex;flex-direction:column}
+.faq-item{border-bottom:1px solid var(--border-3)}
+.faq-item:first-child{border-top:1px solid var(--border-3)}
+.faq-q{width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;text-align:left;padding:20px 4px;font-size:15.5px;font-weight:500;color:#fff;transition:color .2s}
+.faq-q:hover{color:var(--purple)}
+.faq-q svg{flex:0 0 auto;color:var(--fg-3);transition:transform .25s}
+.faq-item.open .faq-q svg{transform:rotate(180deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.faq-a .in{padding:0 4px 20px;color:var(--fg-3);font-size:14.5px;line-height:1.65;max-width:820px}
+.faq-a .in a{color:var(--purple)}
+.foot{margin-top:56px;padding-top:22px;border-top:1px solid var(--border-3);display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;color:var(--fg-4);font-size:13px}
+.foot .d{color:var(--fg-3)}
+
+/* ===== Toast ===== */
+#toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:#1e1e22;border:1px solid var(--border-h);color:var(--fg);padding:11px 18px;border-radius:12px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:100;max-width:90vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ===== Mobile ===== */
+@media (max-width:760px){
+  .rail{display:none}
+  .burger{display:flex}
+  .sidebar{position:fixed;z-index:60;left:0;top:0;bottom:0;margin-left:-272px;box-shadow:20px 0 60px rgba(0,0,0,.5);width:272px;flex-basis:272px}
+  .sidebar.open-m{margin-left:0}
+  .backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:50}
+  .backdrop.show{display:block}
+  .cards{grid-template-columns:repeat(2,1fr);gap:10px}
+  .scard{min-height:104px}
+  .feat-grid,.steps{grid-template-columns:1fr}
+  .topbar{padding:8px 12px}
+  .brand .word{display:none}
+  .chat-scroll{padding:6px 10px 0}
+  .input-wrap{padding:0 10px}
+  .model-menu{right:44px}
+  .empty h1{font-size:24px}
+  .empty{padding-top:6vh}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- Rail -->
+  <nav class="rail" aria-label="Основная навигация">
+    <button class="rail-btn" id="railToggle" title="Свернуть панель" aria-label="Свернуть панель">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9 4v16"/></svg>
+    </button>
+    <a class="rail-btn active" href="#" title="Главная" aria-label="Главная">
+      <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20"><path d="M8.52 2.16a2.35 2.35 0 0 1 2.96 0l6.56 5.34a.8.8 0 0 1-1.01 1.24l-.63-.51v7.23a2 2 0 0 1-2 2H12v-4.1a2 2 0 0 0-4 0v4.1H5.6a2 2 0 0 1-2-2V8.23l-.63.51A.8.8 0 0 1 1.96 7.5l6.56-5.34Z"/></svg>
+    </a>
+    <div class="rail-spacer"></div>
+    <img class="rail-logo" src="favicon.svg" alt="io.ru"/>
+  </nav>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <button class="new-chat" id="newChatBtn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/></svg>
+      <span>Новый чат</span>
+    </button>
+    <div class="side-label">Чаты</div>
+    <div class="chat-list" id="chatList"></div>
+    <div class="side-foot">
+      <div class="side-card">
+        <b>Без регистрации</b>
+        <span>Чаты сохраняются в этом браузере и доступны только вам.</span>
+      </div>
+      <div class="side-card">
+        <b>io.ru</b>
+        <span>ChatGPT онлайн на русском — без VPN и без аккаунта.</span>
+      </div>
+    </div>
+  </aside>
+  <div class="backdrop" id="backdrop"></div>
+
+  <!-- Main -->
+  <main class="main" id="main">
+    <header class="topbar">
+      <button class="icon-btn burger" id="burger" aria-label="Открыть меню">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+      <div class="brand">
+        <img src="favicon.svg" alt=""/>
+        <span class="word">MashaGPT</span>
+      </div>
+      <div class="topbar-right">
+        <span class="chip"><span class="dot"></span>Безлимит · без регистрации</span>
+      </div>
+    </header>
+
+    <div class="chat-shell">
+      <div class="chat-scroll" id="chatScroll">
+        <div class="chat-inner">
+          <!-- Empty state -->
+          <div class="empty" id="emptyState">
+            <div style="text-align:center;width:100%">
+              <h1>Чем могу помочь?</h1>
+              <div class="boot" style="justify-content:center;margin-top:18px">
+                <svg viewBox="0 0 38 38" width="26" height="26" fill="none"><path fill="currentColor" d="M18.9901 6.70488L19.1228 6.70488L20.7297 11.0428C21.7977 13.9263 24.0722 16.1992 26.9564 17.2654L31.3036 18.8723V18.9935V19.1366L26.9564 20.7435C24.0722 21.8096 21.7977 24.0826 20.7297 26.966L19.1235 31.3022H18.9901H18.8567L17.2505 26.966C16.1825 24.0826 13.908 21.8096 11.0238 20.7435L6.70642 19.1476L6.70642 18.982L6.70642 18.8613L11.0238 17.2654C13.908 16.1992 16.1824 13.9263 17.2505 11.0428L18.8574 6.70488L18.9901 6.70488Z"/></svg>
+                <span>Готово к работе — пишите прямо здесь</span>
+              </div>
+            </div>
+            <div class="cards">
+              <button class="scard" data-prompt="Составь структуру презентации на 8 слайдов по моей теме. Для каждого слайда дай заголовок и 3–5 тезисов. Тема: ">
+                <svg viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd"><path d="M6.5 2h7.17a2 2 0 0 1 1.42.59l4.32 4.32A2 2 0 0 1 20 8.33V19.5A2.5 2.5 0 0 1 17.5 22h-11A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2ZM8 11.25h8v1.7H8v-1.7Zm0 4h5.5v1.7H8v-1.7Z"/></svg>
+                <span class="t">Офис</span><span class="d">Презентации, таблицы, файлы</span>
+              </button>
+              <button class="scard" data-prompt="Составь подробный текстовый промпт для генерации изображения. Что должно быть на картинке: ">
+                <svg viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd"><path d="M5.5 3h13A2.5 2.5 0 0 1 21 5.5v13a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 18.5v-13A2.5 2.5 0 0 1 5.5 3Zm3.25 7.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM5 18.5h14v-2.1l-3.9-4.2-2.6 2.8-3.1-3.4L5 16.4v2.1Z"/></svg>
+                <span class="t">Картинки</span><span class="d">Промпты для изображений</span>
+              </button>
+              <button class="scard" data-prompt="Придумай сценарий короткого видео на 30 секунд: раскадровка по секундам, текст и музыка. Идея: ">
+                <svg viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd"><path d="M5 5h9a2.5 2.5 0 0 1 2.5 2.5v9A2.5 2.5 0 0 1 14 19H5a2.5 2.5 0 0 1-2.5-2.5v-9A2.5 2.5 0 0 1 5 5Zm12.5 5.2 3.4-2.4A.7.7 0 0 1 22 8.4v7.2a.7.7 0 0 1-1.1.6l-3.4-2.4v-3.6Z"/></svg>
+                <span class="t">Видео</span><span class="d">Сценарии и раскадровка</span>
+              </button>
+              <button class="scard" data-prompt="Придумай текст песни: куплеты, припев, бридж. Тема и настроение: ">
+                <svg viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd"><path d="M20.2 2.1A1 1 0 0 1 21.5 3v12.6a3.4 3.4 0 1 1-2-3.1V7.3l-9 2.1v8.3a3.4 3.4 0 1 1-2-3.1V6.6a1 1 0 0 1 .8-1l10.9-3.5Z"/></svg>
+                <span class="t">Музыка</span><span class="d">Тексты и структура трека</span>
+              </button>
+            </div>
+          </div>
+          <!-- Messages -->
+          <div class="msgs" id="msgs"></div>
+        </div>
+      </div>
+
+      <!-- Input -->
+      <div class="input-wrap">
+        <div class="att-chips" id="attChips"></div>
+        <div class="input-box">
+          <textarea id="input" rows="1" placeholder="Что мне нужно сделать?" spellcheck="true"></textarea>
+          <button class="mini-btn" id="attachBtn" title="Прикрепить файл (текст, код)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+          </button>
+          <button class="model-btn" id="modelBtn" title="Выбрать модель">
+            <span class="nm" id="modelName">ChatGPT 6.1</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <button class="send-btn" id="sendBtn" title="Отправить сообщение" disabled>
+            <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>
+          </button>
+          <div class="model-menu" id="modelMenu"></div>
+        </div>
+        <div class="disclaimer">Нейросеть может ошибаться. Проверяйте важную информацию.</div>
+      </div>
+    </div>
+
+    <!-- Landing -->
+    <section class="landing" id="landing">
+      <div class="landing-inner">
+        <h2>ChatGPT онлайн на русском языке</h2>
+        <p class="lead">ChatGPT онлайн в MashaGPT — это русскоязычный ИИ-чат для текстов, кода, файлов и повседневных вопросов. Чат GPT работает в браузере без VPN и без регистрации: поставьте задачу, получите ответ и уточняйте результат в том же диалоге.</p>
+
+        <h3 class="sec">Что умеет нейросеть Чат GPT</h3>
+        <div class="feat-grid">
+          <div class="feat">
+            <div class="ic"><svg class="" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2 4 6v6c0 5 3.4 8.6 8 10 4.6-1.4 8-5 8-10V6l-8-4Z"/></svg></div>
+            <h4>Две модели для старта</h4>
+            <p>Без входа можно выбрать ChatGPT 6.1. Доступный лимит отображается рядом с чатом — в этом режиме он всегда «Безлимит».</p>
+          </div>
+          <div class="feat">
+            <div class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 0 1 6.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5H18"/></svg></div>
+            <h4>На русском языке</h4>
+            <p>ChatGPT и Claude понимают запросы на русском языке. Можно писать естественно, задавать тон, аудиторию и нужную форму ответа.</p>
+          </div>
+          <div class="feat">
+            <div class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12.55a11 11 0 0 1 14.08 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01M1.42 9a16 16 0 0 1 21.16 0"/></svg></div>
+            <h4>Онлайн без VPN</h4>
+            <p>Откройте Чат GPT онлайн на компьютере или смартфоне. Устанавливать отдельную программу и подключать VPN для MashaGPT не требуется.</p>
+          </div>
+          <div class="feat">
+            <div class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="3"/><path stroke-linecap="round" d="M9 9h6v6H9zM9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></svg></div>
+            <h4>Актуальные семейства ИИ</h4>
+            <p>В каталоге — модели OpenAI, Anthropic, Google и xAI. Конкретный состав зависит от текущего каталога и доступности.</p>
+          </div>
+        </div>
+
+        <h3 class="sec">Как пользоваться Чат GPT онлайн</h3>
+        <div class="steps">
+          <div class="step">
+            <div class="num">1</div>
+            <h4>Просто откройте сайт</h4>
+            <p>Регистрация не нужна: без email-кода и входа через VK, Яндекс ID или Mail.ru. Чат доступен сразу — бесплатно.</p>
+          </div>
+          <div class="step">
+            <div class="num">2</div>
+            <h4>Выберите модель ИИ</h4>
+            <p>Для первого диалога доступен ChatGPT 6.1. В селекторе — актуальные модели OpenAI, Anthropic, Google и xAI.</p>
+          </div>
+          <div class="step">
+            <div class="num">3</div>
+            <h4>Начните диалог</h4>
+            <p>Задавайте вопросы, ставьте задачи, прикрепляйте текстовые файлы. Нейросеть мгновенно даст развёрнутый ответ.</p>
+          </div>
+        </div>
+
+        <h3 class="sec">Часто задаваемые вопросы</h3>
+        <div class="faq" id="faq"></div>
+
+        <div class="foot">
+          <span class="d">© io.ru — ChatGPT онлайн на русском без VPN и регистрации</span>
+          <span>Интерфейс: клон MashaGPT · демо без аккаунта</span>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<input type="file" id="fileInput" hidden accept=".txt,.md,.markdown,.csv,.json,.js,.ts,.py,.java,.c,.cpp,.h,.cs,.go,.rs,.php,.rb,.sql,.html,.css,.xml,.yml,.yaml,.ini,.log,text/*"/>
+<div id="toast"></div>
+
+<script>
+"use strict";
+/* ================= Storage & state ================= */
+const LS_CHATS = "ioGPT_chats_v1", LS_ACTIVE = "ioGPT_active_v1", LS_MODEL = "ioGPT_model_v1";
+const MODELS = [
+  { id:"chatgpt",  name:"ChatGPT 6.1",    family:"OpenAI",   api:"openai" },
+  { id:"claude",   name:"Claude Opus 5.5",family:"Anthropic",api:"openai" },
+  { id:"gemini",   name:"Gemini 3.0",     family:"Google",   api:"openai" },
+  { id:"grok",     name:"Grok 4",         family:"xAI",      api:"openai" }
+];
+const API_FALLBACK = ["openai","openai-fast","mistral","deepseek","llama"];
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+
+function loadChats(){ try { return JSON.parse(localStorage.getItem(LS_CHATS)) || []; } catch(e){ return []; } }
+function saveChats(){ try { localStorage.setItem(LS_CHATS, JSON.stringify(chats)); } catch(e){} }
+let chats = loadChats();
+let activeId = localStorage.getItem(LS_ACTIVE) || null;
+if(!chats.find(c=>c.id===activeId)) activeId = null;
+let model = MODELS.find(m=>m.id===localStorage.getItem(LS_MODEL)) || MODELS[0];
+let streaming = null; // AbortController
+let attachments = []; // {name, text}
+
+function newId(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function activeChat(){ return chats.find(c=>c.id===activeId) || null; }
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove("show"),3200); }
+
+/* ================= Sidebar ================= */
+function renderChats(){
+  const list = $("#chatList"); list.innerHTML = "";
+  if(!chats.length){ list.innerHTML = '<div class="no-chats">Пока нет чатов.<br>Нажмите «Новый чат» и напишите первое сообщение.</div>'; return; }
+  const sorted = chats.slice().sort((a,b)=>b.updated-a.updated);
+  for(const c of sorted){
+    const el = document.createElement("div");
+    el.className = "chat-item" + (c.id===activeId ? " active":"");
+    el.innerHTML = '<span class="t"></span><button class="del" title="Удалить чат"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>';
+    el.querySelector(".t").textContent = c.title || "Новый чат";
+    el.addEventListener("click", ()=>{ openChat(c.id); closeMobileSidebar(); });
+    el.querySelector(".del").addEventListener("click", (e)=>{ e.stopPropagation(); deleteChat(c.id); });
+    list.appendChild(el);
+  }
+}
+function openChat(id){ activeId = id; localStorage.setItem(LS_ACTIVE, id||""); render(); }
+function createChat(){
+  activeId = null; attachments = []; renderAttachChips();
+  localStorage.removeItem(LS_ACTIVE); render();
+  $("#input").focus();
+}
+function deleteChat(id){
+  const i = chats.findIndex(c=>c.id===id);
+  if(i<0) return;
+  chats.splice(i,1); saveChats();
+  if(activeId===id){ activeId = chats.length ? chats.slice().sort((a,b)=>b.updated-a.updated)[0].id : null; if(activeId) localStorage.setItem(LS_ACTIVE,activeId); else localStorage.removeItem(LS_ACTIVE); }
+  render();
+}
+
+/* ================= Render ================= */
+function render(){
+  renderChats();
+  const chat = activeChat();
+  const msgs = $("#msgs"), empty = $("#emptyState");
+  msgs.innerHTML = "";
+  if(!chat || !chat.messages.length){
+    empty.style.display = "flex"; msgs.style.display = "none";
+    $("#landing").style.display = "";
+  } else {
+    empty.style.display = "none"; msgs.style.display = "flex";
+    $("#landing").style.display = "none";
+    for(const m of chat.messages) msgs.appendChild(msgEl(m));
+    scrollBottom(true);
+  }
+  $("#modelName").textContent = model.name;
+  renderModelMenu();
+  updateSendState();
+}
+function msgEl(m){
+  const d = document.createElement("div");
+  d.className = "msg " + (m.role==="user" ? "user":"ai");
+  const av = document.createElement("div");
+  av.className = "avatar" + (m.role==="user" ? "":" masha");
+  av.innerHTML = m.role==="user" ? "Вы" : '<img src="favicon.svg" style="width:100%;height:100%" alt=""/>';
+  const b = document.createElement("div"); b.className = "mbody";
+  const who = document.createElement("div"); who.className = "mwho";
+  who.textContent = m.role==="user" ? "Вы" : model.name;
+  const tx = document.createElement("div"); tx.className = "mtext";
+  if(m.role==="user"){
+    if(m.file){ const f=document.createElement("div"); f.className="filechip"; f.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>'; f.appendChild(document.createTextNode(m.file)); tx.appendChild(f); }
+    const p=document.createElement("div"); p.textContent = m.content; tx.appendChild(p);
+  } else {
+    tx.innerHTML = m.error ? '<div class="err-note"></div>' : md(m.content||"");
+    if(m.error) tx.querySelector(".err-note").textContent = m.error;
+  }
+  b.appendChild(who); b.appendChild(tx); d.appendChild(av); d.appendChild(b);
+  return d;
+}
+function addMsg(role, content, extra){
+  let chat = activeChat();
+  if(!chat){ chat = { id:newId(), title:"", model:model.id, messages:[], created:Date.now(), updated:Date.now() }; chats.push(chat); activeId=chat.id; localStorage.setItem(LS_ACTIVE,activeId);
+    $("#emptyState").style.display="none"; $("#msgs").style.display="flex"; $("#landing").style.display="none"; }
+  const m = Object.assign({ role, content, ts:Date.now() }, extra||{});
+  chat.messages.push(m); chat.updated = Date.now();
+  if(!chat.title && role==="user") chat.title = (m.content||"").replace(/\s+/g," ").slice(0,42) || "Новый чат";
+  saveChats(); renderChats();
+  $("#msgs").appendChild(msgEl(m));
+  scrollBottom(true);
+  return { chat, m, el:$("#msgs").lastElementChild };
+}
+function scrollBottom(force){
+  const sc = $("#main");
+  const nearBottom = sc.scrollHeight - sc.scrollTop - sc.clientHeight < 160;
+  if(force || nearBottom) sc.scrollTop = sc.scrollHeight;
+}
+function updateSendState(){
+  const v = $("#input").value.trim();
+  const btn = $("#sendBtn");
+  if(streaming){ btn.disabled=false; btn.classList.add("stop"); btn.title="Остановить";
+    btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>';
+  } else {
+    btn.classList.remove("stop"); btn.title="Отправить сообщение";
+    btn.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>';
+    btn.disabled = !v && !attachments.length;
+  }
+}
+
+/* ================= Model menu ================= */
+function renderModelMenu(){
+  const menu = $("#modelMenu"); menu.innerHTML="";
+  for(const m of MODELS){
+    const o=document.createElement("div");
+    o.className="model-opt"+(m.id===model.id?" sel":"");
+    o.innerHTML='<span class="n"></span><span class="f"></span>';
+    o.querySelector(".n").textContent=m.name; o.querySelector(".f").textContent=m.family;
+    o.addEventListener("click",e=>{ e.stopPropagation(); model=m; localStorage.setItem(LS_MODEL,m.id); render(); });
+    menu.appendChild(o);
+  }
+}
+$("#modelBtn").addEventListener("click",e=>{ e.stopPropagation(); $("#modelMenu").classList.toggle("open"); });
+document.addEventListener("click",()=>$("#modelMenu").classList.remove("open"));
+
+/* ================= Markdown ================= */
+function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function md(src){
+  if(!src) return "";
+  const blocks=[], langs=[];
+  src = src.replace(/```([\w+#.-]*)\n?([\s\S]*?)(?:```|$)/g, (m,lang,code)=>{ blocks.push(code); langs.push(lang); return "\u0000B"+(blocks.length-1)+"\u0000"; });
+  src = esc(src);
+  const inline = t => t
+    .replace(/`([^`\n]+)`/g,"<code>$1</code>")
+    .replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>")
+    .replace(/(^|[\s(—–])\*([^*\n]+)\*/g,"$1<em>$2</em>")
+    .replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g,'<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+  const lines = src.split("\n");
+  let html="", listType=null, para=[];
+  const closeList=()=>{ if(listType){ html+="</"+listType+">"; listType=null; } };
+  const closePara=()=>{ if(para.length){ html+="<p>"+inline(para.join("<br>"))+"</p>"; para=[]; } };
+  for(const line of lines){
+    let m;
+    if(m=line.match(/^\u0000B(\d+)\u0000\s*$/)){
+      closeList(); closePara();
+      html+='<pre class="codeblock"><div class="codehead"><span class="cl"></span><button class="codecopy" type="button">Копировать</button></div><code class="cb" data-bi="'+m[1]+'"></code></pre>';
+      continue;
+    }
+    if(/^\s*$/.test(line)){ closeList(); closePara(); continue; }
+    if(m=line.match(/^(#{1,4})\s+(.*)/)){ closeList(); closePara(); const l=Math.min(m[1].length+2,6); html+="<h"+l+">"+inline(m[2])+"</h"+l+">"; continue; }
+    if(/^\s*([-*]|\d+[.)])\s+/.test(line)){
+      const isO=/^\s*\d+[.)]\s+/.test(line);
+      closePara();
+      const want=isO?"ol":"ul";
+      if(listType!==want){ closeList(); html+="<"+want+">"; listType=want; }
+      html+="<li>"+inline(line.replace(/^\s*([-*]|\d+[.)])\s+/,""))+"</li>";
+      continue;
+    }
+    if(/^\s*&gt;/.test(line)){ closeList(); closePara(); html+="<blockquote>"+inline(line.replace(/^\s*&gt;\s?/,""))+"</blockquote>"; continue; }
+    para.push(line);
+  }
+  closeList(); closePara();
+  md.lastBlocks=blocks; md.lastLangs=langs;
+  return html;
+}
+function fillCode(tx){
+  tx.querySelectorAll("code.cb").forEach(c=>{
+    const bi=+c.dataset.bi;
+    c.textContent = (md.lastBlocks&&md.lastBlocks[bi]!=null) ? md.lastBlocks[bi] : "";
+    const pre=c.closest("pre"), sp=pre&&pre.querySelector(".cl");
+    if(sp) sp.textContent = (md.lastLangs&&md.lastLangs[bi]) || "code";
+  });
+}
+document.addEventListener("click",e=>{
+  const b=e.target.closest(".codecopy");
+  if(!b) return;
+  const code=b.closest("pre").querySelector("code");
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(code.textContent||"").then(()=>{ b.textContent="Скопировано"; setTimeout(()=>b.textContent="Копировать",1400); }).catch(()=>{});
+  }
+});
+
+/* ================= FAQ ================= */
+const FAQ = [
+["Нужно ли регистрироваться, чтобы пользоваться Чат GPT?","Нет. Просто откройте сайт и начните диалог: без email, кодов подтверждения и входа через VK, Яндекс ID или Mail.ru. Доступ бесплатный."],
+["Какие ограничения имеет бесплатный Чат GPT?","Ограничений по числу сообщений нет: в этом режиме дневной лимит всегда «Безлимит». Доступные модели видны в селекторе рядом с чатом."],
+["Нужна ли подписка или оплата?","Нет. Все модели из селектора работают бесплатно — без тарифов, подписок и оплаты."],
+["Какие модели нейросетей доступны пользователям?","В селекторе — актуальные семейства: OpenAI, Anthropic, Google и xAI. Конкретный состав зависит от текущего каталога и доступности."],
+["Чем нейросеть Чат GPT лучше других чат-ботов?","ChatGPT удерживает контекст диалога, работает с файлами и помогает с текстами, кодом и анализом. Но лучшая модель зависит от задачи: Claude, Gemini или Grok в отдельных сценариях могут быть удобнее."],
+["Нужно ли устанавливать программу ChatGPT?","Нет, можно просто открыть сайт в браузере и сразу начать диалог с ИИ. Установка и регистрация не требуются."],
+["Что такое токен в системе ИИ?","Токен — это фрагмент текста, который обрабатывает языковая модель. Он может быть целым словом, частью слова или знаком; соотношение токенов и символов зависит от языка и конкретного текста."],
+["Безопасно ли работать с ИИ ЧатГПТ?","Не передавайте нейросети пароли, платежные данные, закрытые документы и другую информацию, которую нельзя раскрывать третьим лицам."],
+["У вас есть техническая поддержка?","Сайт работает без регистрации: чаты сохраняются в вашем браузере. Если что-то не сработало — начните новый чат или просто обновите страницу."]
+];
+function renderFaq(){
+  const box=$("#faq");
+  for(const pair of FAQ){
+    const it=document.createElement("div"); it.className="faq-item";
+    const btn=document.createElement("button"); btn.className="faq-q"; btn.type="button";
+    const qs=document.createElement("span"); qs.textContent=pair[0];
+    btn.appendChild(qs);
+    btn.insertAdjacentHTML("beforeend","<svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>");
+    const an=document.createElement("div"); an.className="faq-a";
+    const inn=document.createElement("div"); inn.className="in"; inn.textContent=pair[1];
+    an.appendChild(inn);
+    btn.addEventListener("click",()=>{
+      const open=it.classList.contains("open");
+      $$(".faq-item.open").forEach(o=>{ o.classList.remove("open"); o.querySelector(".faq-a").style.maxHeight="0"; });
+      if(!open){ it.classList.add("open"); an.style.maxHeight=an.scrollHeight+"px"; }
+    });
+    it.appendChild(btn); it.appendChild(an); box.appendChild(it);
+  }
+}
+
+/* ================= AI API (pollinations, keyless) ================= */
+function apiMessages(){
+  const chat=activeChat();
+  const out=[{role:"system",content:"Ты — полезный ИИ-ассистент. Отвечай на языке пользователя (по умолчанию — на русском). Форматируй ответы в Markdown: заголовки, списки, блоки кода. Отвечай развёрнуто и по делу."}];
+  const msgs=(chat&&chat.messages)||[];
+  const start=msgs.length>12?msgs.length-12:0;
+  for(const m of msgs.slice(start)){
+    if(m.error||!m.content) continue;
+    out.push({role:m.role==="user"?"user":"assistant",content:(m.file?"[Файл: "+m.file+"]\n":"")+m.content});
+  }
+  return out;
+}
+async function streamTo(api,onDelta,signal){
+  const r=await fetch("https://text.pollinations.ai/openai",{
+    method:"POST",signal,
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({model:api,messages:apiMessages(),stream:true,max_tokens:4096})
+  });
+  if(!r.ok||!r.body) throw new Error("http "+r.status);
+  const reader=r.body.getReader(), dec=new TextDecoder();
+  let buf="";
+  while(true){
+    const {done,value}=await reader.read();
+    if(done) break;
+    buf+=dec.decode(value,{stream:true});
+    let i;
+    while((i=buf.indexOf("\n"))>=0){
+      const line=buf.slice(0,i).trim(); buf=buf.slice(i+1);
+      if(!line.startsWith("data:")) continue;
+      const data=line.slice(5).trim();
+      if(data==="[DONE]") return;
+      try{
+        const j=JSON.parse(data);
+        const ch=j.choices&&j.choices[0];
+        if(!ch) continue;
+        const d=(ch.delta&&ch.delta.content)||"";
+        if(d) onDelta(d);
+      }catch(e){}
+    }
+  }
+}
+async function send(){
+  if(streaming){ streaming.abort(); return; }
+  const text=$("#input").value.trim();
+  if(!text&&!attachments.length) return;
+  const fileLabel=attachments.length?attachments.map(a=>a.name).join(", "):undefined;
+  const fileContent=attachments.length?"\n\n"+attachments.map(a=>"[Файл: "+a.name+"]\n"+a.text.slice(0,20000)).join("\n\n"):"";
+  addMsg("user",text,{file:fileLabel});
+  $("#input").value=""; autoSize(); attachments=[]; renderAttachChips();
+  const {m:am,el:ael}=addMsg("ai","",{model:model.name});
+  ael.querySelector(".mtext").innerHTML='<span class="think"><i></i><i></i><i></i></span>';
+  streaming=new AbortController(); updateSendState();
+  let full="", got=false;
+  const onDelta=d=>{ if(!got){ got=true; ael.querySelector(".mtext").innerHTML=""; } full+=d; const tx=ael.querySelector(".mtext"); tx.innerHTML=md(full); fillCode(tx); scrollBottom(); };
+  let lastErr=null;
+  try{
+    for(const api of API_FALLBACK){
+      try{ await streamTo(api,onDelta,streaming.signal); break; }
+      catch(e){ lastErr=e; if(streaming.signal.aborted) throw e; if(got) break; }
+    }
+    if(!got){
+      try{
+        const q=encodeURIComponent(((text+fileContent).trim()||"привет").slice(-1400));
+        const r=await fetch("https://text.pollinations.ai/"+q+"?model=openai",{signal:streaming.signal});
+        if(!r.ok) throw new Error("http "+r.status);
+        const t=(await r.text()).slice(0,20000);
+        if(t&&t.length<400&&!/[\n.!?…]/.test(t)) throw new Error("short");
+        onDelta(t); full=t;
+      }catch(e){ lastErr=lastErr||e; }
+    }
+  }catch(e){
+    if(!streaming.signal.aborted) lastErr=lastErr||e;
+  }
+  const tx=ael.querySelector(".mtext");
+  if(streaming.signal.aborted){
+    am.pending=false;
+    if(full){ am.content=full; tx.innerHTML=md(full); fillCode(tx); }
+    else { am.content=""; am.error="Генерация остановлена."; tx.innerHTML='<div class="err-note">Генерация остановлена.</div>'; }
+  } else if(full){
+    am.pending=false; am.content=full; am.error=undefined;
+    tx.innerHTML=md(full); fillCode(tx);
+  } else {
+    am.pending=false; am.content="";
+    am.error="Не удалось получить ответ: сервис ИИ временно перегружен. Попробуйте ещё раз через минуту.";
+    tx.innerHTML='<div class="err-note"></div>';
+    tx.querySelector(".err-note").textContent=am.error;
+  }
+  saveChats(); renderChats();
+  streaming=null; updateSendState(); scrollBottom();
+}
+
+/* ================= UI events ================= */
+const input=$("#input");
+function autoSize(){ input.style.height="auto"; input.style.height=Math.min(input.scrollHeight,180)+"px"; updateSendState(); }
+input.addEventListener("input",autoSize);
+input.addEventListener("keydown",e=>{ if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); send(); } });
+$("#sendBtn").addEventListener("click",send);
+$("#newChatBtn").addEventListener("click",()=>{ createChat(); closeMobileSidebar(); });
+$$(".scard").forEach(b=>b.addEventListener("click",()=>{ input.value=b.dataset.prompt||""; autoSize(); input.focus(); }));
+$("#attachBtn").addEventListener("click",()=>$("#fileInput").click());
+$("#fileInput").addEventListener("change",e=>{
+  for(const f of e.target.files){
+    if(attachments.length>=3){ toast("Можно прикрепить до 3 файлов"); break; }
+    if(f.size>100*1024){ toast("Файл больше 100 КБ: "+f.name); continue; }
+    const rd=new FileReader();
+    rd.onload=()=>{ attachments.push({name:f.name,text:String(rd.result||"")}); renderAttachChips(); updateSendState(); };
+    rd.onerror=()=>toast("Не удалось прочитать файл");
+    rd.readAsText(f);
+  }
+  e.target.value="";
+});
+function renderAttachChips(){
+  const box=$("#attChips"); box.innerHTML="";
+  attachments.forEach((a,i)=>{
+    const c=document.createElement("span"); c.className="att-chip";
+    const sp=document.createElement("span"); sp.textContent=a.name;
+    const b=document.createElement("button"); b.type="button"; b.textContent="✕"; b.title="Убрать файл";
+    b.addEventListener("click",()=>{ attachments.splice(i,1); renderAttachChips(); updateSendState(); });
+    c.appendChild(sp); c.appendChild(b); box.appendChild(c);
+  });
+}
+$("#railToggle").addEventListener("click",()=>$("#sidebar").classList.toggle("closed"));
+$("#burger").addEventListener("click",()=>{ $("#sidebar").classList.add("open-m"); $("#backdrop").classList.add("show"); });
+function closeMobileSidebar(){ $("#sidebar").classList.remove("open-m"); $("#backdrop").classList.remove("show"); }
+$("#backdrop").addEventListener("click",closeMobileSidebar);
+
+/* ================= Init ================= */
+renderFaq();
+render();
+</script>
+</body>
+</html></
